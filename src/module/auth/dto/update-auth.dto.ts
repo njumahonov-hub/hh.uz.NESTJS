@@ -17,4 +17,10 @@ export class UpdateAuthDto {
   @IsOptional()
   @IsString()
   last_name?: string;
+
+  
+  @ApiProperty({ required: false, default: "904236768" })
+  @IsOptional()
+  @IsString()
+  phone_number?: string;
 }

@@ -198,7 +198,7 @@ export class AuthService {
 async getProfile(id: number) {
   const user = await this.authRepo.findOne({
     where: { id },
-    select: ['username', 'email', 'first_name', 'last_name', 'profil_img']
+    select: ['username', 'email', 'first_name', 'last_name', 'profil_img', 'phone_number']
   })
 
     if(!user) throw new NotFoundException("User not found")

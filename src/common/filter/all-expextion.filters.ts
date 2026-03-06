@@ -3,35 +3,44 @@ import {
   Catch,
   ArgumentsHost,
   HttpException,
-  
-} from '@nestjs/common';
-import { Response } from 'express';
+  HttpStatus,
+  Logger,
+} from "@nestjs/common";
+import { Request, Response } from "express";
 
 @Catch()
-export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+export class HttpExceptionFilter implements ExceptionFilter {
+  private readonly logger = new Logger(HttpExceptionFilter.name);
+
+  catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
+    const request = ctx.getRequest<Request>();
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : 500;
+    let status: number;
+    let message: string | any;
 
-    const message =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : exception.message || 'Internal server error';
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const res = exception.getResponse();
+
+      message =
+        typeof res === "string"
+          ? res
+          : Array.isArray((res as any).message)
+            ? (res as any).message.join(", ")
+            : (res as any).message;
+    } else {
+      status = HttpStatus.INTERNAL_SERVER_ERROR;
+      message = "Internal server error";
+    }
 
     response.status(status).json({
       statusCode: status,
-      message:
-        typeof message === 'string'
-          ? message
-          : (message as any).message || 'Internal server error',
-      error: exception.name || 'UnknownError',
-      stack: exception.stack || null,
       timestamp: new Date().toISOString(),
+      path: request.url,
+      method: request.method,
+      message,
     });
   }
 }

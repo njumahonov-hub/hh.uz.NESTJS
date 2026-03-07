@@ -21,8 +21,8 @@ async function bootstrap() {
   //  swagger
 
   const config = new DocumentBuilder()
-    .setTitle("Article project")
-    .setDescription("article documantation")
+    .setTitle("FindWork project")
+    .setDescription("FindWork documantation")
     .setVersion("1.0.0")
     .addBearerAuth(
       {
